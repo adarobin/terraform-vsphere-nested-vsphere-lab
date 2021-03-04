@@ -236,7 +236,7 @@ variable "nsxt_manager_ip_address" {
   description = "The IP address of the NSX-t Manager Appliance"
 }
 
-variable "vcsa_mac_address" {
+variable "nsxt_manager_mac_address" {
   type        = string
   description = "The MAC address of the NSX-T Manager Appliance"
   default     = ""
