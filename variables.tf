@@ -85,6 +85,11 @@ variable "esxi_hostname_ip_map" {
   description = "A map containing the short hostname of each ESXi host to be deployed as the key and the IP address as the value."
 }
 
+variable "esxi_hostname_mac_map" {
+  type = map(string)
+  description = "A map containing the short hostname of each ESXi host to be deployed as the key and the MAC address as the value."
+}
+
 variable "esxi_cpu_count" {
   type = number
   default = 2
@@ -118,12 +123,18 @@ variable "vcsa_memory_override" {
 variable "vcsa_deployment_size" {
   type = string
   default = "tiny"
-  description = "The deployment size of the vCenter Server Appliances.  Defaults to \"tiny\". Presently, this does not work."
+  description = "The deployment size of the vCenter Server Appliances.  Defaults to \"tiny\"."
 }
 
 variable "vcsa_ip_address" {
   type = string
   description = "The IP address of the vCenter Server Appliance"
+}
+
+variable "vcsa_mac_address" {
+  type        = string
+  description = "The MAC address of the vCenter Server Appliance"
+  default     = ""
 }
 
 variable "vcsa_short_hostname" {

@@ -43,7 +43,9 @@ resource "vsphere_virtual_machine" "vcsa" {
   enable_logging         = true
 
   network_interface {
-    network_id = var.network_id
+    network_id     = var.network_id
+    use_static_mac = var.mac_address == "" ? false : true
+    mac_address    = var.mac_address
   }
 
   cdrom {

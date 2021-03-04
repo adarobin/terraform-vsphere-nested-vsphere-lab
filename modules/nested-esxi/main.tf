@@ -25,7 +25,9 @@ resource "vsphere_virtual_machine" "esxi" {
   wait_for_guest_ip_timeout  = 5
 
   network_interface {
-    network_id = var.network_id
+    network_id     = var.network_id
+    use_static_mac = contains(keys(var.hostname_mac_map), each.key) ? true : false
+    mac_address    = lookup(var.hostname_mac_map, each.key, "")
   }
 
   network_interface {

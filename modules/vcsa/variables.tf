@@ -38,6 +38,11 @@ variable "ip_address" {
   description = "The IP address of the vCenter Server Appliance."
 }
 
+variable "mac_address" {
+  type = string
+  description = "The MAC address of the vCenter Server Appliance."
+}
+
 variable "cpu_count_override" {
   type        = number
   default     = 0

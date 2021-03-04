@@ -49,6 +49,11 @@ variable "hostname_ip_map" {
   description = "A map containing the short hostname of each ESXi host to be deployed as the key and the IP address as the value."
 }
 
+variable "hostname_mac_map" {
+  type        = map(string)
+  description = "A map containing the short hostname of each ESXi host to be deployed as the key and the MAC address as the value."
+}
+
 variable "cpu_count" {
   type        = number
   default     = 2

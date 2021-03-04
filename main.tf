@@ -45,13 +45,14 @@ module "nested-esxi-hosts" {
   cpu_count = var.esxi_cpu_count
   memory = var.esxi_memory
 
-  hostname_ip_map = var.esxi_hostname_ip_map
-  dns             = var.dns
-  domain          = var.domain
-  gateway         = var.gateway
-  netmask         = var.netmask
-  ntp             = var.ntp
-  syslog          = var.vcsa_ip_address
+  hostname_ip_map  = var.esxi_hostname_ip_map
+  hostname_mac_map = var.esxi_hostname_mac_map
+  dns              = var.dns
+  domain           = var.domain
+  gateway          = var.gateway
+  netmask          = var.netmask
+  ntp              = var.ntp
+  syslog           = var.vcsa_ip_address
 
   enable_ssh  = var.esxi_enable_ssh
   enable_vsan = var.enable_vsan
@@ -79,6 +80,7 @@ module "vcsa" {
   gateway        = var.gateway
   ntp            = var.ntp
   ip_address     = var.vcsa_ip_address
+  mac_address    = var.vcsa_mac_address
 
   enable_ssh  = var.vcsa_enable_ssh
 
