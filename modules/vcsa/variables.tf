@@ -1,5 +1,5 @@
 variable "ova_path" {
-  type = string
+  type        = string
   description = "The full path to the vCenter Server Appliance OVA."
 }
 
@@ -19,28 +19,30 @@ variable "datacenter_id" {
 }
 
 variable "resource_pool_id" {
-    type        = string
-    description = "The ID of the resource pool the vCenter Server Appliance should be created in."
+  type        = string
+  description = "The ID of the resource pool the vCenter Server Appliance should be created in."
 }
 
 variable "datastore_id" {
-    type        = string
-    description = "The ID of the datastore the vCenter Server Appliance should be created in."
+  type        = string
+  description = "The ID of the datastore the vCenter Server Appliance should be created in."
 }
 
 variable "host_system_id" {
-    type = string
-    description = "The ID of the host system that the vCenter Server Appliance OVA will be initially deployed on."
+  type        = string
+  description = "The ID of the host system that the vCenter Server Appliance OVA will be initially deployed on."
 }
 
 variable "ip_address" {
-  type = string
-  description = "The IP address of the vCenter Server Appliance."
+  type        = string
+  default     = ""
+  description = "The IP address of the vCenter Server Appliance. This defaults to \"\" which results in DHCP being used."
 }
 
 variable "mac_address" {
-  type = string
-  description = "The MAC address of the vCenter Server Appliance."
+  type        = string
+  default     = ""
+  description = "The MAC address of the vCenter Server Appliance. This defaults to \"\" which results in a MAC address being generated."
 }
 
 variable "cpu_count_override" {
@@ -69,16 +71,22 @@ variable "deployment_size" {
   type        = string
   default     = "tiny"
   description = "The deployment size of the vCenter Server Appliances.  Defaults to \"tiny\"."
+
+  validation {
+    condition     = contains(["tiny", "small", "medium", "large", "xlarge", "tiny-lstorage", "small-lstorage", "medium-lstorage", "large-lstorage", "xlarge-lstorage", "tiny-xlstorage", "small-xlstorage", "medium-xlstorage", "large-xlstorage", "xlarge-xlstorage"], var.deployment_size)
+    error_message = "The memory_override value must greater than or equal to 0."
+  }
 }
 
 variable "short_hostname" {
-  type = string
+  type        = string
   description = "The short hostname of the vCenter Server Appliance"
 }
 
 variable "prefix" {
-  type = number
-  description = "The subnet of the vCenter Server Appliance in CIDR format."
+  type        = number
+  default     = null
+  description = "The subnet of the vCenter Server Appliance in CIDR format. This defaults to `null`. Must be set if a static IP is set in `ip_address`."
 }
 
 variable "sso_domain_name" {
@@ -94,27 +102,30 @@ variable "enable_ssh" {
 }
 
 variable "provisioner_timeout" {
-  type = number
+  type        = number
+  default     = 60
   description = "The max amount of time to wait in minutes for the vCenter Server Appliance to become available after provisioning"
-  default = 60
 }
 
 variable "domain" {
-  type = string
-  description = "The DNS domain the vCenter Server Appliance resides on. DNS records must exist ahead of provisioning."
+  type        = string
+  description = "The DNS domain the vCenter Server Appliance resides on. DNS records must exist ahead of provisioning or DDNS must be working in the environment."
 }
 
 variable "dns" {
-  type = string
-  description = "The DNS server for the vCenter Server Appliance."
+  type        = string
+  default     = ""
+  description = "The DNS server(s) for the vCenter Server Appliance. This defaults to \"\" which results in DHCP being used. Must be set if a static IP is set in `ip_address`."
 }
 
 variable "ntp" {
-  type = string
-  description = "The NTP server for the vCenter Server Appliance."
+  type        = string
+  default     = "pool.ntp.org"
+  description = "The NTP server for the vCenter Server Appliance. Defaults to \"pool.ntp.org\"."
 }
 
 variable "gateway" {
-  type = string
-  description = "The gateway of the vCenter Server Appliance."
+  type        = string
+  default     = ""
+  description = "The gateway of the vCenter Server Appliance. This defaults to \"\" which results in DHCP being used. Must be set if a static IP is set in `ip_address`"
 }

@@ -8,7 +8,7 @@ locals {
         "ceip_enabled" = true
         "standalone" = {
           "sso_admin_password" = random_password.administrator_password.result
-          "sso_domain_name" = var.sso_domain_name
+          "sso_domain_name"    = var.sso_domain_name
         }
       }
     }
@@ -16,24 +16,25 @@ locals {
 }
 
 resource "random_password" "root_password" {
-  length = 16
+  length  = 16
   special = true
 }
 
 resource "random_password" "administrator_password" {
-  length = 16
+  length  = 16
   special = true
 }
 
 data "vsphere_ovf_vm_template" "ova" {
-  name = var.short_hostname
-  resource_pool_id = var.resource_pool_id
-  datastore_id = var.datastore_id
-  host_system_id = var.host_system_id
-  local_ovf_path = var.ova_path
+  name              = var.short_hostname
+  resource_pool_id  = var.resource_pool_id
+  datastore_id      = var.datastore_id
+  host_system_id    = var.host_system_id
+  local_ovf_path    = var.ova_path
   deployment_option = var.deployment_size
+  
   ovf_network_map = {
-    "Network 1": var.network_id
+    "Network 1" : var.network_id
   }
 }
 
@@ -60,15 +61,13 @@ resource "vsphere_virtual_machine" "vcsa" {
     mac_address    = var.mac_address
   }
 
-  cdrom {
-    client_device = true
-  }
+  cdrom {}
 
   ovf_deploy {
-    local_ovf_path           = var.ova_path
-    disk_provisioning        = "thin"
-    ip_protocol              = "IPv4"
-    
+    local_ovf_path    = var.ova_path
+    disk_provisioning = "thin"
+    ip_protocol       = "IPv4"
+
     ovf_network_map = {
       "Network 1" = var.network_id
     }
@@ -84,15 +83,6 @@ resource "vsphere_virtual_machine" "vcsa" {
       "guestinfo.cis.appliance.net.gateway"     = var.gateway
       "guestinfo.cis.appliance.net.pnid"        = local.hostname
       "guestinfo.cis.appliance.root.passwd"     = random_password.root_password.result
-      
-      //"guestinfo.cis.vmdir.password"            = random_password.administrator_password.result
-      //These properties require `enable_hidden_properties = true`
-      //"guestinfo.cis.appliance.ssh.enabled" = title(tostring(var.enable_ssh))
-      //"guestinfo.cis.deployment.autoconfig" = "True"
-      //"guestinfo.cis.appliance.ntp.servers" = var.ntp
-      //"guestinfo.cis.vmdir.domain-name"     = var.sso_domain_name
-      //"guestinfo.cis.vmdir.username"        = local.sso_administrator
-      //"guestinfo.cis.ceip_enabled"          = "False"
     }
   }
 

@@ -7,11 +7,11 @@ output "administrator_user" {
 }
 
 output "root_password" {
-  value = random_password.root_password.result
+  value     = random_password.root_password.result
   sensitive = true
 }
 
 output "administrator_password" {
-  value = random_password.administrator_password.result
+  value     = random_password.administrator_password.result
   sensitive = true
 }
