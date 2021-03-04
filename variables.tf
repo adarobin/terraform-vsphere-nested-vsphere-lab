@@ -236,6 +236,12 @@ variable "nsxt_manager_ip_address" {
   description = "The IP address of the NSX-t Manager Appliance"
 }
 
+variable "vcsa_mac_address" {
+  type        = string
+  description = "The MAC address of the NSX-T Manager Appliance"
+  default     = ""
+}
+
 variable "nsxt_audit_username" {
   type = string
   description = "The username of the default NSX-t audit user.  Defaults to \"audit\"."

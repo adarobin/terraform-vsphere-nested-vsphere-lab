@@ -109,6 +109,7 @@ module "nsx-t" {
   gateway        = var.gateway
   ntp            = var.ntp
   ip_address     = var.nsxt_manager_ip_address
+  mac_address    = var.nsxt_manager_mac_address
 
   enable_ssh      = var.nsxt_manager_enable_ssh
   enable_root_ssh = var.nsxt_manager_enable_root_ssh

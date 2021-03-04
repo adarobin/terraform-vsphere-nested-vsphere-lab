@@ -72,6 +72,11 @@ variable "ip_address" {
   description = "The IP address of the NSX-t Manager Appliance"
 }
 
+variable "mac_address" {
+  type = string
+  description = "The MAC address of the NSX-T Manager Appliance."
+}
+
 variable "audit_username" {
   type        = string
   default     = "audit"
