@@ -1,6 +1,18 @@
 locals {
   hostname          = join(".", [var.short_hostname, var.domain])
   sso_administrator = "administrator@${var.sso_domain_name}"
+  stage2_install_body = {
+    "spec" = {
+      "auto_answer" = true
+      "vcsa_embedded" = {
+        "ceip_enabled" = true
+        "standalone" = {
+          "sso_admin_password" = random_password.administrator_password.result
+          "sso_domain_name" = var.sso_domain_name
+        }
+      }
+    }
+  }
 }
 
 resource "random_password" "root_password" {
@@ -72,8 +84,8 @@ resource "vsphere_virtual_machine" "vcsa" {
       "guestinfo.cis.appliance.net.gateway"     = var.gateway
       "guestinfo.cis.appliance.net.pnid"        = local.hostname
       "guestinfo.cis.appliance.root.passwd"     = random_password.root_password.result
-      "guestinfo.cis.vmdir.password"            = random_password.administrator_password.result
-
+      
+      //"guestinfo.cis.vmdir.password"            = random_password.administrator_password.result
       //These properties require `enable_hidden_properties = true`
       //"guestinfo.cis.appliance.ssh.enabled" = title(tostring(var.enable_ssh))
       //"guestinfo.cis.deployment.autoconfig" = "True"
@@ -84,15 +96,24 @@ resource "vsphere_virtual_machine" "vcsa" {
     }
   }
 
-  # provisioner "local-exec" {
-  #   command = "${path.module}/vcsa-provisioner.sh"
-  #   environment = {
-  #     VCENTER_HOSTNAME = local.hostname
-  #     VCENTER_USERNAME = local.sso_administrator
-  #     VCENTER_PASSWORD = random_password.administrator_password.result
-  #     TIMEOUT          = var.provisioner_timeout
-  #   }
-  # }
+  provisioner "local-exec" {
+    command = "${path.module}/vcsa-wait-for-stage1.sh "
+    environment = {
+      VCENTER_HOSTNAME = local.hostname
+      VAMI_USERNAME    = "root"
+      VAMI_PASSWORD    = random_password.root_password.result
+    }
+  }
+
+  provisioner "local-exec" {
+    command = "${path.module}/vcsa-stage2.sh "
+    environment = {
+      VCENTER_HOSTNAME = local.hostname
+      VAMI_USERNAME    = "root"
+      VAMI_PASSWORD    = random_password.root_password.result
+      BODY             = jsonencode(local.stage2_install_body)
+    }
+  }
 
   lifecycle {
     ignore_changes = [
