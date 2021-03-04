@@ -120,6 +120,7 @@ resource "vsphere_virtual_machine" "vcsa" {
       // it looks like some of the properties get deleted from the VM after it is deployed
       // just ignore them after the initial deployment
       vapp.0.properties,
+      annotation,
     ]
   }
 }
