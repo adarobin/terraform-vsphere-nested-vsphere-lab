@@ -89,12 +89,6 @@ variable "enable_vsan" {
   description = "Should vSAN be enabled on the nested ESXi host?"
 }
 
-variable "domain" {
-  type        = string
-  default     = ""
-  description = "The DNS domain the nested ESXi host resides on. This defaults to \"\" which results in DHCP being used. Must be set if a static IP is set in `ip_address`."
-}
-
 variable "dns" {
   type        = string
   default     = ""

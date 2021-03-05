@@ -1,5 +1,7 @@
 locals {
-  short_hostname = split(".", var.hostname)[0]
+  split_hostname = split(".", var.hostname)
+  short_hostname = local.split_hostname[0]
+  domain = join(".",slice(local.split_hostname, 1, length(local.split_hostname)))
 }
 
 resource "random_password" "esxi_root_password" {
@@ -56,7 +58,7 @@ resource "vsphere_virtual_machine" "esxi" {
       "guestinfo.netmask"    = var.netmask
       "guestinfo.gateway"    = var.gateway
       "guestinfo.dns"        = var.dns
-      "guestinfo.domain"     = var.domain
+      "guestinfo.domain"     = local.domain
       "guestinfo.ntp"        = var.ntp
       "guestinfo.syslog"     = var.syslog
       "guestinfo.password"   = random_password.esxi_root_password.result
@@ -101,7 +103,7 @@ resource "vsphere_virtual_machine" "esxi" {
   }
 }
 
-data "tls_certificate" "nested_esxi_certificates" {
+data "tls_certificate" "nested_esxi_certificate" {
   url          = "https://${var.hostname}"
   verify_chain = false
 
