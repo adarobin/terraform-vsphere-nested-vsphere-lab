@@ -1,5 +1,7 @@
 locals {
-  manager_hostname = join(".", [var.short_hostname, var.domain])
+  split_hostname = split(".", var.hostname)
+  short_hostname = local.split_hostname[0]
+  domain         = join(".",slice(local.split_hostname, 1, length(local.split_hostname)))
 }
 
 resource "random_password" "root_password" {
@@ -18,7 +20,7 @@ resource "random_password" "audit_password" {
 }
 
 data "vsphere_ovf_vm_template" "ova" {
-  name              = var.short_hostname
+  name              = local.short_hostname
   resource_pool_id  = var.resource_pool_id
   datastore_id      = var.datastore_id
   host_system_id    = var.host_system_id
@@ -69,13 +71,13 @@ resource "vsphere_virtual_machine" "nsxt_manager" {
       "nsx_cli_audit_passwd_0" = random_password.audit_password.result
       "nsx_cli_username"       = var.admin_username
       "nsx_cli_audit_username" = var.audit_username
-      "nsx_hostname"           = local.manager_hostname
+      "nsx_hostname"           = var.hostname
       "nsx_role"               = "NSX Manager"
       "nsx_gateway_0"          = var.gateway
       "nsx_ip_0"               = var.ip_address
       "nsx_netmask_0"          = var.netmask
       "nsx_dns1_0"             = var.dns
-      "nsx_domain_0"           = var.domain
+      "nsx_domain_0"           = local.domain
       "nsx_ntp_0"              = var.ntp
       "nsx_isSSHEnabled"       = title(tostring(var.enable_ssh))
       "nsx_allowSSHRootLogin"  = title(tostring(var.enable_root_ssh))
@@ -92,7 +94,7 @@ resource "vsphere_virtual_machine" "nsxt_manager" {
 }
 
 data "tls_certificate" "nsxt_manager_certificate" {
-  url          = "https://${local.manager_hostname}"
+  url          = "https://${var.hostname}"
   verify_chain = false
 
   depends_on = [

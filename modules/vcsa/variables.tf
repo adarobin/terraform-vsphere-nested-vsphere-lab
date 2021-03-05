@@ -74,13 +74,13 @@ variable "deployment_size" {
 
   validation {
     condition     = contains(["tiny", "small", "medium", "large", "xlarge", "tiny-lstorage", "small-lstorage", "medium-lstorage", "large-lstorage", "xlarge-lstorage", "tiny-xlstorage", "small-xlstorage", "medium-xlstorage", "large-xlstorage", "xlarge-xlstorage"], var.deployment_size)
-    error_message = "The memory_override value must greater than or equal to 0."
+    error_message = "The deployment_size must be one of \"tiny\", \"small\", \"medium\", \"large\", \"xlarge\", \"tiny-lstorage\", \"small-lstorage\", \"medium-lstorage\", \"large-lstorage\", \"xlarge-lstorage\", \"tiny-xlstorage\", \"small-xlstorage\", \"medium-xlstorage\", \"large-xlstorage\", \"xlarge-xlstorage\"."
   }
 }
 
-variable "short_hostname" {
+variable "hostname" {
   type        = string
-  description = "The short hostname of the vCenter Server Appliance"
+  description = "The FQDN of the vCenter Server Appliance. DNS records must exist ahead of provisioning or DDNS must be working in the environment."
 }
 
 variable "prefix" {
@@ -105,11 +105,6 @@ variable "provisioner_timeout" {
   type        = number
   default     = 60
   description = "The max amount of time to wait in minutes for the vCenter Server Appliance to become available after provisioning"
-}
-
-variable "domain" {
-  type        = string
-  description = "The DNS domain the vCenter Server Appliance resides on. DNS records must exist ahead of provisioning or DDNS must be working in the environment."
 }
 
 variable "dns" {

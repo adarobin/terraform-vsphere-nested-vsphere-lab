@@ -80,14 +80,21 @@ variable "domain" {
   description = "The DNS domain the nested machines will reside on. DNS records must exist ahead of provisioning."
 }
 
+variable "esxi_hostnames" {
+  type = list(string)
+  description = "A list of FQDNs corresponding to the ESXi hosts that should be provisioned."
+}
+
 variable "esxi_hostname_ip_map" {
-  type = map(string)
-  description = "A map containing the short hostname of each ESXi host to be deployed as the key and the IP address as the value."
+  type        = map(string)
+  default     = {}
+  description = "A map containing the FQDN of each ESXi host to be deployed as the key and the IP address as the value. If not set, DHCP will be used."
 }
 
 variable "esxi_hostname_mac_map" {
-  type = map(string)
-  description = "A map containing the short hostname of each ESXi host to be deployed as the key and the MAC address as the value."
+  type        = map(string)
+  default     = {}
+  description = "A map containing the FQDN of each ESXi host to be deployed as the key and the MAC address as the value. If not set, MAC addresses will be generated."
 }
 
 variable "esxi_cpu_count" {
@@ -127,8 +134,9 @@ variable "vcsa_deployment_size" {
 }
 
 variable "vcsa_ip_address" {
-  type = string
-  description = "The IP address of the vCenter Server Appliance"
+  type        = string
+  default     = ""
+  description = "The IP address of the vCenter Server Appliance. This defaults to \"\" which results in DHCP being used."
 }
 
 variable "vcsa_mac_address" {
@@ -137,13 +145,14 @@ variable "vcsa_mac_address" {
   default     = ""
 }
 
-variable "vcsa_short_hostname" {
+variable "vcsa_hostname" {
   type = string
-  description = "The short hostname of the vCenter Server Appliance"
+  description = "The FQDN of the vCenter Server Appliance"
 }
 
 variable "prefix" {
-  type = number
+  type        = number
+  default     = null
   description = "The value of `netmask` in CIDR format."
 }
 
@@ -201,9 +210,9 @@ variable "vsan_license_key" {
   default     = ""
 }
 
-variable "nsxt_manager_short_hostname" {
+variable "nsxt_manager_hostname" {
   type = string
-  description = "The short hostname of the NSX-t Manager Appliance"
+  description = "The FQDN of the NSX-T Manager Appliance"
 }
 
 variable "nsxt_manager_cpu_count_override" {

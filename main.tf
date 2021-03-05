@@ -1,3 +1,7 @@
+locals {
+  esxi_hostname_ip_map = { for h in var.esxi_hostnames: h => lookup(var.esxi_hostname_ip_map, h, "") }
+}
+
 data "vsphere_datacenter" "dc" {
   name = var.datacenter_name
 }
@@ -33,6 +37,7 @@ module "outer-config" {
 
 module "nested-esxi-hosts" {
   source = "./modules/nested-esxi"
+  for_each = toset(var.esxi_hostnames)
 
   datacenter_id    = data.vsphere_datacenter.dc.id
   folder_name      = var.folder_name
@@ -45,14 +50,14 @@ module "nested-esxi-hosts" {
   cpu_count = var.esxi_cpu_count
   memory = var.esxi_memory
 
-  hostname_ip_map  = var.esxi_hostname_ip_map
-  hostname_mac_map = var.esxi_hostname_mac_map
-  dns              = var.dns
-  domain           = var.domain
-  gateway          = var.gateway
-  netmask          = var.netmask
-  ntp              = var.ntp
-  syslog           = var.vcsa_ip_address
+  hostname    = each.key
+  ip_address  = local.esxi_hostname_ip_map[each.key]
+  mac_address = lookup(var.esxi_hostname_mac_map, each.key, "")
+  dns         = local.esxi_hostname_ip_map[each.key] == "" ? "" : var.dns
+  gateway     = local.esxi_hostname_ip_map[each.key] == "" ? "" : var.gateway
+  netmask     = local.esxi_hostname_ip_map[each.key] == "" ? "" : var.netmask
+  ntp         = var.ntp
+  syslog      = var.vcsa_ip_address
 
   enable_ssh  = var.esxi_enable_ssh
   enable_vsan = var.enable_vsan
@@ -73,14 +78,13 @@ module "vcsa" {
   memory_override    = var.vcsa_memory_override
   deployment_size    = var.vcsa_deployment_size
 
-  short_hostname = var.vcsa_short_hostname
-  dns            = var.dns
-  domain         = var.domain
-  prefix         = var.prefix
-  gateway        = var.gateway
-  ntp            = var.ntp
-  ip_address     = var.vcsa_ip_address
-  mac_address    = var.vcsa_mac_address
+  hostname    = var.vcsa_hostname
+  dns         = var.vcsa_ip_address == "" ? "" : var.dns
+  prefix      = var.vcsa_ip_address == "" ? null : var.prefix
+  gateway     = var.vcsa_ip_address == "" ? "" : var.gateway
+  ntp         = var.ntp
+  ip_address  = var.vcsa_ip_address
+  mac_address = var.vcsa_mac_address
 
   enable_ssh  = var.vcsa_enable_ssh
 
@@ -102,9 +106,8 @@ module "nsx-t" {
   memory_override    = var.nsxt_manager_memory_override
   deployment_size    = var.nsxt_manager_deployment_size
 
-  short_hostname = var.nsxt_manager_short_hostname
+  hostname       = var.nsxt_manager_hostname
   dns            = var.dns
-  domain         = var.domain
   netmask        = var.netmask
   gateway        = var.gateway
   ntp            = var.ntp

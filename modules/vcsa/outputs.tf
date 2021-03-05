@@ -1,7 +1,3 @@
-output "hostname" {
-  value = local.hostname
-}
-
 output "administrator_user" {
   value = local.sso_administrator
 }

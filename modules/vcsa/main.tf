@@ -1,5 +1,7 @@
 locals {
-  hostname          = join(".", [var.short_hostname, var.domain])
+  split_hostname    = split(".", var.hostname)
+  short_hostname    = local.split_hostname[0]
+  domain            = join(".",slice(local.split_hostname, 1, length(local.split_hostname)))
   sso_administrator = "administrator@${var.sso_domain_name}"
   stage2_install_body = {
     "spec" = {
@@ -26,7 +28,7 @@ resource "random_password" "administrator_password" {
 }
 
 data "vsphere_ovf_vm_template" "ova" {
-  name              = var.short_hostname
+  name              = local.short_hostname
   resource_pool_id  = var.resource_pool_id
   datastore_id      = var.datastore_id
   host_system_id    = var.host_system_id
@@ -46,8 +48,8 @@ resource "vsphere_virtual_machine" "vcsa" {
   host_system_id   = data.vsphere_ovf_vm_template.ova.host_system_id
   datastore_id     = data.vsphere_ovf_vm_template.ova.datastore_id
 
-  num_cpus               = data.vsphere_ovf_vm_template.ova.num_cpus
-  memory                 = data.vsphere_ovf_vm_template.ova.memory
+  num_cpus               = var.cpu_count_override > 0 ? var.cpu_count_override : data.vsphere_ovf_vm_template.ova.num_cpus
+  memory                 = var.memory_override > 0 ? var.memory_override : data.vsphere_ovf_vm_template.ova.memory
   guest_id               = data.vsphere_ovf_vm_template.ova.guest_id
   cpu_hot_add_enabled    = true
   cpu_hot_remove_enabled = true
@@ -81,7 +83,7 @@ resource "vsphere_virtual_machine" "vcsa" {
       "guestinfo.cis.appliance.net.dns.servers" = var.dns
       "guestinfo.cis.appliance.net.prefix"      = var.prefix
       "guestinfo.cis.appliance.net.gateway"     = var.gateway
-      "guestinfo.cis.appliance.net.pnid"        = local.hostname
+      "guestinfo.cis.appliance.net.pnid"        = var.hostname
       "guestinfo.cis.appliance.root.passwd"     = random_password.root_password.result
     }
   }
@@ -89,7 +91,7 @@ resource "vsphere_virtual_machine" "vcsa" {
   provisioner "local-exec" {
     command = "${path.module}/vcsa-wait-for-stage1.sh "
     environment = {
-      VCENTER_HOSTNAME = local.hostname
+      VCENTER_HOSTNAME = var.hostname
       VAMI_USERNAME    = "root"
       VAMI_PASSWORD    = random_password.root_password.result
     }
@@ -98,7 +100,7 @@ resource "vsphere_virtual_machine" "vcsa" {
   provisioner "local-exec" {
     command = "${path.module}/vcsa-stage2.sh "
     environment = {
-      VCENTER_HOSTNAME = local.hostname
+      VCENTER_HOSTNAME = var.hostname
       VAMI_USERNAME    = "root"
       VAMI_PASSWORD    = random_password.root_password.result
       BODY             = jsonencode(local.stage2_install_body)
